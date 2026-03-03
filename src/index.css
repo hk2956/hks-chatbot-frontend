@@ -1,0 +1,128 @@
+/* ========================================================== */
+/* 🐻 한경서 챗봇 폰트 🐻        */
+/* ========================================================== */
+
+/* 1. 티머니 둥근바람: 나눔스퀘어보다 훨씬 더 동글동글하고 부드러운 정석 폰트 */
+@font-face {
+    font-family: 'TmoneyRoundWindRegular';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/TmoneyRoundWindRegular.woff') format('woff');
+    font-weight: 400; font-style: normal;
+}
+
+/* 2. 쿠키런체: 귀엽고 장난기 넘치는 게임 감성 (곰돌이 캐릭터와 찰떡!) */
+@font-face {
+    font-family: 'CookieRun-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/CookieRun-Regular.woff') format('woff');
+    font-weight: 400; font-style: normal;
+}
+
+/* 3. 메이플스토리체: 대한민국에서 가장 대중적으로 친근하고 몽글몽글한 폰트 */
+@font-face {
+    font-family: 'MaplestoryOTFLight';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/MaplestoryOTFLight.woff') format('woff');
+    font-weight: normal; font-style: normal;
+}
+
+/* 4. 넥슨 배찌체: 손글씨와 고딕의 중간 느낌, 동화책 같은 감성 */
+@font-face {
+    font-family: 'Bazzi';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/Bazzi.woff') format('woff');
+    font-weight: normal; font-style: normal;
+}
+
+/* 5. 교보 손글씨: 아예 진짜 학생이 다이어리에 펜으로 꾹꾹 눌러 쓴 것 같은 감성 */
+@font-face {
+    font-family: 'KyoboHand';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/KyoboHand.woff') format('woff');
+    font-weight: normal; font-style: normal;
+}
+
+
+/* ========================================================== */
+/* 🛠️ 폰트 테스트 해보기 */
+/* ========================================================== */
+* {
+  /* font-family: 'TmoneyRoundWindRegular', sans-serif !important;
+  /* font-family: 'CookieRun-Regular', sans-serif !important; */
+  font-family: 'MaplestoryOTFLight', sans-serif !important;
+  /* font-family: 'Bazzi', sans-serif !important; */
+  /* font-family: 'KyoboHand', sans-serif !important; */
+
+  letter-spacing: -0.5px; /* 글자 사이 간격 살짝 좁힘 */
+  line-height: 1.5; /* 줄 간격 (가독성 향상) */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}

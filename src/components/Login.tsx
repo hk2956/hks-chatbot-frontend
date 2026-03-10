@@ -38,7 +38,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         // ==========================
         // 1. [로그인] 모드일 때 처리
         // ==========================
-        const response = await fetch('http://minjun0410.iptime.org:8000/auth/login', {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ user_id: userId, password }),
@@ -98,7 +98,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         width: '400px', display: 'flex', flexDirection: 'column'
       }}>
         <h2 style={{ color: '#333', textAlign: 'center', marginBottom: '20px' }}>
-          🐻 한경 AI 클라이언트
+          한경 AI 클라이언트
         </h2>
 
         {/* ⭐️ 상단 탭 (로그인 / 회원가입) */}

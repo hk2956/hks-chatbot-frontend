@@ -18,6 +18,9 @@ export default function Live2DViewer() {
       view: canvasRef.current,
       backgroundAlpha: 0,
       resizeTo: window,
+
+      resolution: window.devicePixelRatio || 1, 
+      autoDensity: true,
     });
 
     const modelUrl = '/Resources/Bear Commander Belongs_to_DG_STUDIO/Bear Commander Belongs_to_DG_STUDIO.model3.json';
@@ -32,6 +35,11 @@ export default function Live2DViewer() {
       app.stage.addChild(model as any);
 
       resizeHandler = () => {
+        if (app.renderer.resolution !== window.devicePixelRatio) {
+          app.renderer.resolution = window.devicePixelRatio || 1;
+          app.resize();
+        }
+        
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
 
@@ -79,7 +87,7 @@ export default function Live2DViewer() {
   // ==========================================
   // 🕹️ 리모컨 조종
   // ==========================================
-
+  /*
   const playMotionArms = () => modelRef.current?.motion('', 0);
   
   const resetMotion = () => {
@@ -111,7 +119,7 @@ export default function Live2DViewer() {
   const expContempt = () => modelRef.current?.expression(5);  // 5: 경멸
   
   const resetExpression = () => modelRef.current?.internalModel.motionManager.expressionManager?.resetExpression();
-
+  */
   return (
     <>
       <canvas
@@ -119,7 +127,7 @@ export default function Live2DViewer() {
         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}
       />
 
-      {isLoaded && (
+      {/* isLoaded && (
         <div style={{
           position: 'absolute', bottom: '20px', left: '20px', zIndex: 10,
           backgroundColor: 'rgba(255, 255, 255, 0.9)', padding: '15px',
@@ -150,13 +158,13 @@ export default function Live2DViewer() {
             🔄 표정 초기화
           </button>
         </div>
-      )}
+      )*/}
     </>
   );
 }
 
 // 리모컨 버튼 디자인
-const btnStyle = {
+/* const btnStyle = {
   padding: '8px 12px',
   cursor: 'pointer',
   borderRadius: '5px',
@@ -164,4 +172,4 @@ const btnStyle = {
   backgroundColor: '#f9f9f9',
   fontFamily: 'inherit',
   fontSize: '13px'
-};
+}; */

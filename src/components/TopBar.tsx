@@ -91,15 +91,23 @@ export default function TopBar({ onLogout }: TopBarProps) {
         </h2>
       </div>
 
-      {/* ➡️ 오른쪽 영역: 사용자 정보 및 버튼 그룹 */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         
-        {/* ⭐️ 4. 상태(State)에 저장된 사용자 정보로 출력하기 */}
-        <div style={{ textAlign: 'right', color: '#555', fontSize: '14px' }}>
-          <span style={{ display: 'block', fontWeight: 'bold', color: '#333' }}>
-            🐯 {userInfo.name} {userInfo.user_id ? `(${userInfo.user_id})` : ''}
-          </span>
-          <span style={{ fontSize: '12px' }}>{userInfo.department}</span>
+        <div style={{ display: 'flex', alignItems: 'top', gap: '10px', textAlign: 'right', color: '#555', fontSize: '14px' }}>
+          <img 
+            src="/Resources/profile.png"
+            alt="profile" 
+            style={{ 
+              width: '36px', 
+              height: '36px',
+            }} 
+          />
+          <div>
+            <span style={{ display: 'block', fontWeight: 'bold', color: '#333' }}>
+              {userInfo.name} {userInfo.user_id ? `(${userInfo.user_id})` : ''}
+            </span>
+            <span style={{ fontSize: '12px' }}>{userInfo.department}</span>
+          </div>
         </div>
 
         {/* 버튼들 */}

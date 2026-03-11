@@ -1,0 +1,46 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "Bear Commander Belongs_to_DG_STUDIO.moc3",
+		"Textures": [
+			"Bear Commander Belongs_to_DG_STUDIO.4096/texture_00.png",
+			"Bear Commander Belongs_to_DG_STUDIO.4096/texture_01.png"
+		],
+		"Physics": "Bear Commander Belongs_to_DG_STUDIO.physics3.json",
+		"DisplayInfo": "Bear Commander Belongs_to_DG_STUDIO.cdi3.json",
+
+		"Expressions": [
+			{ "Name": "기본", "File": "exp/1.exp3.json" },
+            { "Name": "화난", "File": "exp/3.exp3.json" },
+            { "Name": "슬픈", "File": "exp/4.exp3.json" },
+            { "Name": "사랑", "File": "exp/5.exp3.json" },
+			{ "Name": "반짝", "File": "exp/6.exp3.json" },
+			{ "Name": "경멸", "File": "exp/7.exp3.json" }
+        ],
+
+		"Motions": {
+			"": [
+				{
+					"File": "motions/팔짱.motion3.json"
+				}
+			]
+		}
+	},
+	
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		},
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
+		}
+	],
+	"HitAreas": []
+}

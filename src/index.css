@@ -1,5 +1,5 @@
 /* ========================================================== */
-/* 🐻 한경서 챗봇 폰트 🐻        */
+/*                   🐻 한경서 챗봇 폰트 🐻                    */
 /* ========================================================== */
 
 /* 1. 티머니 둥근바람: 나눔스퀘어보다 훨씬 더 동글동글하고 부드러운 정석 폰트 */
@@ -37,6 +37,76 @@
     font-weight: normal; font-style: normal;
 }
 
+/* 6. 나눔스퀘어 라운드: 가장 안정적이고 호불호 없는 동글동글한 웹 표준 폰트 */
+@font-face {
+    font-family: 'NanumSquareRound';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff') format('woff');
+    font-weight: normal; font-style: normal;
+}
+
+/* 7. 라인 시드 (LINE Seed KR): 라인 메신저의 친근하고 둥근 감성, 완벽한 글자 지원 */
+@font-face {
+    font-family: 'LINESeedKR-Rg';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Rg.woff2') format('woff2');
+    font-weight: 400; font-style: normal;
+}
+
+/* 8. G마켓 산스: 깔끔하면서도 각지지 않아 대화형 UI에 찰떡인 트렌디한 폰트 */
+@font-face {
+    font-family: 'GmarketSansMedium';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+    font-weight: normal; font-style: normal;
+}
+
+/* 9. 프리텐다드 (Pretendard): "절대 깨지지 않는" 현시대 웹 폰트의 정석. 가독성 1티어 */
+@font-face {
+    font-family: 'Pretendard-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 400; font-style: normal;
+}
+
+/* 10. 카페24 써라운드 에어: 동글동글한 귀여움을 잃지 않으면서도 얇아서 말풍선에 딱 좋음 */
+@font-face {
+    font-family: 'Cafe24SsurroundAir';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24SsurroundAir.woff') format('woff');
+    font-weight: normal; font-style: normal;
+}
+
+/* 11. 빙그레체: 바나나맛 우유 감성의 부드럽고 따뜻한 폰트 (지원 글자 빵빵함) */
+@font-face {
+    font-family: 'Binggrae';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Binggrae.woff') format('woff');
+    font-weight: normal; font-style: normal;
+}
+
+/* 12. 학교안심 동그라미: 교육부 배포 폰트라 외계어 지원이 완벽하고 엄청 귀여운 글씨체 */
+@font-face {
+    font-family: 'HakgyoansimDonggeuramiTTF-R';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-2@1.0/HakgyoansimDonggeuramiTTF-R.woff2') format('woff2');
+    font-weight: 400; font-style: normal;
+}
+
+/* 13. 넥슨 레벨2 고딕: 게임 폰트지만 본문용으로 개발되어 매우 깔끔하고 정돈된 감성 */
+@font-face {
+    font-family: 'NEXON Lv2 Gothic';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/NEXON Lv2 Gothic.woff') format('woff');
+    font-weight: normal; font-style: normal;
+}
+
+/* 14. 원스토어 모바일: 모바일과 채팅 화면에서 가장 읽기 편하도록 디자인된 둥근 폰트 */
+@font-face {
+    font-family: 'ONE-Mobile-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/ONE-Mobile-Regular.woff') format('woff');
+    font-weight: normal; font-style: normal;
+}
+
+/* 15. 고운 돋움: 둥근 고딕과 손글씨의 중간 느낌으로, 차분하면서도 정갈한 느낌을 줌 */
+@font-face {
+    font-family: 'GowunDodum-Regular';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/GowunDodum-Regular.woff') format('woff');
+    font-weight: normal; font-style: normal;
+}
+
 
 /* ========================================================== */
 /* 🛠️ 폰트 테스트 해보기 */
@@ -44,9 +114,20 @@
 * {
   /* font-family: 'TmoneyRoundWindRegular', sans-serif !important; */
   /* font-family: 'CookieRun-Regular', sans-serif !important; */
-  font-family: 'MaplestoryOTFLight', sans-serif !important;
+  /* font-family: 'MaplestoryOTFLight', sans-serif !important; */
   /* font-family: 'Bazzi', sans-serif !important; */
   /* font-family: 'KyoboHand', sans-serif !important; */
+
+  /* font-family: 'NanumSquareRound', sans-serif !important; */
+  /* font-family: 'LINESeedKR-Rg', sans-serif !important; */
+  /* font-family: 'GmarketSansMedium', sans-serif !important; */
+  /* font-family: 'Pretendard-Regular', sans-serif !important; */
+  /* font-family: 'Cafe24SsurroundAir', sans-serif !important; */
+  font-family: 'Binggrae', sans-serif !important;
+  /* font-family: 'HakgyoansimDonggeuramiTTF-R', sans-serif !important; */
+  /* font-family: 'NEXON Lv2 Gothic', sans-serif !important; */
+  /* font-family: 'ONE-Mobile-Regular', sans-serif !important; */
+  /* font-family: 'GowunDodum-Regular', sans-serif !important; */
 
   letter-spacing: -0.5px; /* 글자 사이 간격 살짝 좁힘 */
   line-height: 1.5; /* 줄 간격 (가독성 향상) */

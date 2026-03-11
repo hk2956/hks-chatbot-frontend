@@ -5,26 +5,30 @@ interface Message {
   text: string;
   thinking?: string;
   tools?: string[];
-  // ⭐️ [추가] 채팅창에 이미지를 띄워주기 위한 속성
   imageUrl?: string; 
 }
 
 export default function ChatBox() {
+  const IS_MOCK_MODE = true;
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasAnswerStarted, setHasAnswerStarted] = useState(false);
 
-  // ⭐️ [추가] 이미지 상태 관리
   const [selectedImageBase64, setSelectedImageBase64] = useState<string | null>(null);
   const [selectedImageType, setSelectedImageType] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [zoomedImageUrl, setZoomedImageUrl] = useState<string | null>(null);
+
+  const [isDragging, setIsDragging] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const thinkingScrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  // ⭐️ [추가] 숨겨진 파일 첨부 input을 조종할 리모컨
+  
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dragCounter = useRef(0);
 
   const lastBotIndex = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -46,11 +50,18 @@ export default function ChatBox() {
 
         if (response.ok) {
           const history = await response.json();
+          const cachedImagesStr = localStorage.getItem('chat_image_cache');
+          const cachedImages = cachedImagesStr ? JSON.parse(cachedImagesStr) : {};
+
           if (history.length > 0) {
-            const formattedHistory = history.map((msg: any) => ({
-              sender: msg.role === 'user' ? 'user' : 'bot',
-              text: msg.content.replace(/\\n/g, '\n'),
-            }));
+            const formattedHistory = history.map((msg: any) => {
+              const msgText = msg.content.replace(/\\n/g, '\n');
+              return {
+                sender: msg.role === 'user' ? 'user' : 'bot',
+                text: msgText,
+                imageUrl: msg.role === 'user' ? cachedImages[msgText] : undefined
+              };
+            });
             setMessages(formattedHistory);
           } else {
             setMessages([
@@ -66,8 +77,25 @@ export default function ChatBox() {
   }, []);
 
   useEffect(() => {
+    const imageCache: Record<string, string> = {};
+    messages.forEach(msg => {
+      if (msg.sender === 'user' && msg.imageUrl && msg.text) {
+        imageCache[msg.text] = msg.imageUrl; 
+      }
+    });
+
+    if (Object.keys(imageCache).length > 0) {
+      try {
+        localStorage.setItem('chat_image_cache', JSON.stringify(imageCache));
+      } catch (e) {
+        console.warn("캐시 용량 초과: 이전 사진 중 일부가 저장되지 않을 수 있습니다.");
+      }
+    }
+  }, [messages]);
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading, previewUrl]); // previewUrl 추가해서 미리보기 뜰 때도 스크롤 내려가게
+  }, [messages, isLoading, previewUrl]);
 
   useEffect(() => {
     const el = thinkingScrollRef.current;
@@ -85,33 +113,67 @@ export default function ChatBox() {
     }
   }, [isLoading]);
 
-  // ⭐️ [추가] 이미지 첨부 핸들러
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const processFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드할 수 있습니다!');
+      return;
+    }
 
-    // 1. 화면 미리보기용 URL 생성
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
-    setSelectedImageType(file.type); // ex) "image/jpeg"
+    setSelectedImageType(file.type);
 
-    // 2. 백엔드 전송용 Base64 변환
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result as string;
-      // 백엔드는 순수 base64 데이터만 필요하므로 앞의 메타데이터(data:image/jpeg;base64,) 부분을 잘라냅니다.
       const base64Data = base64String.split(',')[1];
       setSelectedImageBase64(base64Data);
     };
     reader.readAsDataURL(file);
   };
 
-  // ⭐️ [추가] 첨부한 이미지 취소
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current += 1;
+    setIsDragging(true); 
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current -= 1;
+    
+    if (dragCounter.current === 0) {
+      setIsDragging(false); 
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current = 0;
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) processFile(file);
+  };
+
   const removeImage = () => {
     setPreviewUrl(null);
     setSelectedImageBase64(null);
     setSelectedImageType(null);
-    if (fileInputRef.current) fileInputRef.current.value = ''; // input 초기화
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const formatToolLabel = (raw: string) => {
@@ -126,17 +188,25 @@ export default function ChatBox() {
     return cleaned.replace(/\s+/g, ' ');
   };
 
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputText(e.target.value);
+    e.target.style.height = '48px'; 
+    const scrollHeight = e.target.scrollHeight;
+    e.target.style.height = `${Math.min(scrollHeight, 120)}px`;
+    e.target.style.overflowY = scrollHeight > 120 ? 'auto' : 'hidden';
+  };
+
   const handleSendMessage = async () => {
-    // 텍스트도 없고 이미지도 없으면 안 보냄
     if (inputText.trim() === '' && !selectedImageBase64) return;
 
     setHasAnswerStarted(false);
 
-    // ⭐️ 화면에 내가 보낸 이미지와 텍스트 띄워주기
+    const permanentImageUrl = selectedImageBase64 ? `data:${selectedImageType};base64,${selectedImageBase64}` : undefined;
+
     const userMessage: Message = { 
       sender: 'user', 
       text: inputText, 
-      imageUrl: previewUrl || undefined 
+      imageUrl: permanentImageUrl 
     };
     setMessages((prev) => [...prev, userMessage]);
 
@@ -144,18 +214,46 @@ export default function ChatBox() {
     setInputText('');
     setIsLoading(true);
 
-    // 전송 직전에 현재 가지고 있던 이미지 상태들을 백업하고 비워줌 (연속 전송 방지)
+    setMessages((prev) => [...prev, { sender: 'bot', text: '', thinking: '', tools: [] }]);
+
+    // ⭐️ 가짜 모드 작동 부분!
+    if (IS_MOCK_MODE) {
+      setTimeout(() => {
+        setMessages((prev) => {
+          const newMessages = [...prev];
+          const lastIndex = newMessages.length - 1;
+          newMessages[lastIndex] = {
+            ...newMessages[lastIndex],
+            text: "서버 없이 프론트엔드 단독 모드로 테스트 중입니다! 🤖\n\n1. UI 수정\n2. 드래그 앤 드롭 테스트\n마음껏 해보세요!",
+            thinking: "이미지도 잘 올라오고, 드래그도 잘 되는다잉." 
+          };
+          return newMessages;
+        });
+        setIsLoading(false);
+        setHasAnswerStarted(true);
+      }, 1500); 
+      
+      if (inputRef.current) {
+        inputRef.current.style.height = '48px';
+        inputRef.current.style.overflowY = 'hidden';
+      }
+      removeImage();
+      return; 
+    }
+    
+    if (inputRef.current) {
+      inputRef.current.style.height = '48px';
+      inputRef.current.style.overflowY = 'hidden';
+    }
+
     const imageToSend = selectedImageBase64;
     const imageTypeToSend = selectedImageType;
     removeImage();
-
-    setMessages((prev) => [...prev, { sender: 'bot', text: '', thinking: '', tools: [] }]);
 
     try {
       const token = localStorage.getItem('jwt_token');
       if (!token) throw new Error("로그인이 필요합니다.");
 
-      // ⭐️ 백엔드 팀원이 준 코드 적용
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/chat/stream`, {
         method: 'POST',
         headers: {
@@ -275,22 +373,53 @@ export default function ChatBox() {
   };
 
   return (
-    <div style={{
-      position: 'absolute', right: '20px', top: '120px', bottom: '20px', width: '600px',
-      backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '20px',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', zIndex: 10, overflow: 'hidden'
-    }}>
+    <div 
+      onDragEnter={handleDragEnter}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      style={{
+        position: 'absolute', right: '20px', top: '120px', bottom: '20px', width: '600px',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '20px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', zIndex: 10, overflow: 'hidden'
+      }}
+    >
       <style>
         {`
           .dot-flashing { animation: dot-flashing 1s infinite alternate; }
           @keyframes dot-flashing { 0% { opacity: 0.3; } 100% { opacity: 1; } }
-          
-          /* 스크롤바 예쁘게 */
           ::-webkit-scrollbar { width: 8px; }
           ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
           ::-webkit-scrollbar-track { background: transparent; }
         `}
       </style>
+
+      {isDragging && (
+        <div style={{
+          position: 'absolute', 
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(32, 33, 35, 0.85)',
+          backdropFilter: 'blur(5px)',
+          zIndex: 9999,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          pointerEvents: 'none',
+          color: 'white',
+          animation: 'fadeIn 0.2s ease-in-out'
+        }}>
+          <div style={{ fontSize: '60px', marginBottom: '20px', textShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
+            📋
+          </div>
+          
+          <p style={{ 
+            marginTop: '12px', 
+            fontSize: '15px', 
+            color: '#d1d5db',
+            fontWeight: '500' 
+          }}>
+            대화에 추가하려면 여기에 파일을 드롭하세요
+          </p>
+        </div>
+      )}
 
       <div style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
         {messages.map((msg, index) => {
@@ -298,7 +427,6 @@ export default function ChatBox() {
           const isEmptyBotBubble = msg.sender === 'bot' && msg.text === '' && (msg.thinking ?? '') === '' && (msg.tools?.length ?? 0) === 0;
 
           if (isEmptyBotBubble && !(isLoading && isLastBot)) return null;
-          // 텍스트도 없고 이미지도 없으면 렌더링 안함
           if (msg.sender === 'user' && !msg.text && !msg.imageUrl) return null;
 
           const hasThinkingBox = msg.sender === 'bot' && !!msg.thinking;
@@ -312,14 +440,12 @@ export default function ChatBox() {
                 maxWidth: '80%', display: 'flex', flexDirection: 'column', gap: '6px'
               }}
             >
-              {/* 생각 중 인디케이터... (기존 동일) */}
               {isLoading && isLastBot && !hasAnswerStarted && (
                 <div style={{ alignSelf: 'flex-start', color: '#666', padding: '5px 15px', fontSize: '14px', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span>🤔 한경서가 생각 중</span><span className="dot-flashing">...</span>
                 </div>
               )}
 
-              {/* 생각 과정... (기존 동일) */}
               {hasThinkingBox && (
                 <>
                   <div style={{ color: '#888', fontFamily: 'sans-serif', fontSize: '12px', fontWeight: 'bold', paddingLeft: '6px' }}>💭 한경서의 생각 과정</div>
@@ -329,7 +455,6 @@ export default function ChatBox() {
                 </>
               )}
 
-              {/* 툴 사용 내역... (기존 동일) */}
               {toolList.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', paddingLeft: '6px' }}>
                   {toolList.map((tool, i) => (
@@ -340,23 +465,21 @@ export default function ChatBox() {
                 </div>
               )}
 
-              {/* ⭐️ [추가] 사용자가 보낸 이미지 렌더링 */}
               {msg.imageUrl && (
                 <img 
                   src={msg.imageUrl} 
                   alt="uploaded" 
+                  onClick={() => setZoomedImageUrl(msg.imageUrl || null)} 
+                  onLoad={() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })} // 👈 핵심 추가 부분!!
                   style={{ 
-                    maxWidth: '100%', 
-                    maxHeight: '200px', 
-                    borderRadius: '15px', 
-                    objectFit: 'cover',
-                    alignSelf: 'flex-end',
-                    marginBottom: msg.text ? '4px' : '0' // 밑에 텍스트가 있으면 간격 띄우기
+                    maxWidth: '100%', maxHeight: '200px', borderRadius: '15px', 
+                    objectFit: 'cover', alignSelf: 'flex-end',
+                    cursor: 'zoom-in',
+                    marginBottom: msg.text ? '4px' : '0'
                   }} 
                 />
               )}
 
-              {/* 실제 대화 말풍선 */}
               {msg.text && (
                 <div style={{
                   backgroundColor: msg.sender === 'user' ? '#00285a' : '#e9f2ff',
@@ -374,81 +497,80 @@ export default function ChatBox() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ⭐️ [추가] 이미지 미리보기 UI (전송 전) */}
       {previewUrl && (
-        <div style={{ 
-          padding: '10px 15px', 
-          backgroundColor: '#f8f9fa', 
-          borderTop: '1px solid #eee', 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '10px' 
-        }}>
+        <div style={{ padding: '10px 15px', backgroundColor: '#f8f9fa', borderTop: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ position: 'relative' }}>
             <img src={previewUrl} alt="preview" style={{ height: '50px', borderRadius: '8px', objectFit: 'cover' }} />
-            <button 
-              onClick={removeImage}
-              style={{
-                position: 'absolute', top: '-5px', right: '-5px',
-                backgroundColor: '#ff4d4f', color: 'white', border: 'none',
-                borderRadius: '50%', width: '20px', height: '20px',
-                fontSize: '12px', cursor: 'pointer', display: 'flex', 
-                alignItems: 'center', justifyContent: 'center', fontWeight: 'bold'
-              }}
-            >
-              ✕
-            </button>
+            <button onClick={removeImage} style={{ position: 'absolute', top: '-5px', right: '-5px', backgroundColor: '#ff4d4f', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>✕</button>
           </div>
           <span style={{ fontSize: '13px', color: '#666' }}>이미지 첨부됨</span>
         </div>
       )}
 
       {/* 하단 입력 영역 */}
-      <div style={{ display: 'flex', padding: '15px', borderTop: '1px solid #eee', backgroundColor: 'white', alignItems: 'center' }}>
-        
-        {/* ⭐️ [추가] 숨겨진 파일 첨부 인풋 & 클릭 버튼 */}
-        <input 
-          type="file" 
-          accept="image/*" 
-          ref={fileInputRef} 
-          onChange={handleImageUpload} 
-          style={{ display: 'none' }} 
-        />
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isLoading}
-          style={{
-            background: 'none', border: 'none', fontSize: '24px', 
-            cursor: isLoading ? 'not-allowed' : 'pointer', marginRight: '10px',
-            opacity: isLoading ? 0.5 : 1
-          }}
-          title="이미지 첨부"
-        >
-          📷
-        </button>
+      <div style={{ display: 'flex', padding: '15px', borderTop: '1px solid #eeeeee', backgroundColor: 'white', alignItems: 'center' }}>
+        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageUpload} style={{ display: 'none' }} />
+        <button onClick={() => fileInputRef.current?.click()} disabled={isLoading} style={{ background: 'none', border: 'none', fontSize: '12px', cursor: isLoading ? 'not-allowed' : 'pointer', marginRight: '10px', opacity: isLoading ? 0.5 : 1 }} title="이미지 첨부">➕</button>
 
-        <input
-          ref={inputRef}
-          type="text"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-          placeholder="질문이나 이미지를 입력해주세요..."
+        <textarea
+          ref={inputRef} 
+          value={inputText} 
+          onChange={handleTextChange} 
+          onKeyDown={(e) => {
+            if (e.nativeEvent.isComposing) return; 
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault(); 
+              handleSendMessage();
+            }
+          }}
+          placeholder="한경서에게 물어보기 ....." 
           disabled={isLoading}
-          style={{ flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid #ccc', marginRight: '10px' }}
+          rows={1}
+          style={{ 
+            flex: 1, 
+            padding: '12px 14px',
+            borderRadius: '10px', 
+            border: '1px solid #ccc', 
+            marginRight: '10px',
+            resize: 'none', 
+            fontFamily: 'inherit',
+            lineHeight: '1.5',
+            
+            boxSizing: 'border-box',
+            height: '48px',
+            minHeight: '48px',       
+            overflowY: 'hidden',
+            outline: 'none'
+          }}
         />
-        <button
-          onClick={handleSendMessage}
-          disabled={isLoading}
+        <button onClick={handleSendMessage} disabled={isLoading} style={{ padding: '10px 20px', backgroundColor: isLoading ? '#ccc' : '#00285a', color: 'white', border: 'none', borderRadius: '10px', cursor: isLoading ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}>전송</button>
+      </div>
+
+      {/* 이미지 크게 보기 모달 */}
+      {zoomedImageUrl && (
+        <div 
+          onClick={() => setZoomedImageUrl(null)} 
           style={{
-            padding: '10px 20px', backgroundColor: isLoading ? '#ccc' : '#00285a',
-            color: 'white', border: 'none', borderRadius: '10px',
-            cursor: isLoading ? 'not-allowed' : 'pointer', fontWeight: 'bold'
+            position: 'fixed', 
+            top: 0, left: 0, width: '100vw', height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)', 
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 9999, 
+            cursor: 'zoom-out' 
           }}
         >
-          전송
-        </button>
-      </div>
+          <img 
+            src={zoomedImageUrl} 
+            alt="zoomed" 
+            style={{ 
+              maxWidth: '90%', maxHeight: '90%', 
+              borderRadius: '10px', 
+              boxShadow: '0 4px 20px rgba(0,0,0,0.5)' 
+            }} 
+          />
+        </div>
+      )}
+
     </div>
   );
 }

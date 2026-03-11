@@ -5,6 +5,7 @@ interface LoginProps {
 }
 
 export default function Login({ onLoginSuccess }: LoginProps) {
+  const IS_MOCK_MODE = true;
   // ⭐️ 탭 전환을 위한 상태 (true: 로그인 화면, false: 회원가입 화면)
   const [isLoginMode, setIsLoginMode] = useState(true);
 
@@ -32,6 +33,19 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     setErrorMsg('');
     setSuccessMsg('');
     setIsLoading(true);
+
+    // ⭐️ [추가] 가짜 모드일 때 무조건 로그인 성공 처리!
+    if (IS_MOCK_MODE) {
+      setIsLoading(true);
+      setTimeout(() => {
+        // 프론트짱(0000) 테스트학과 정보가 담긴 가짜 JWT 토큰
+        const fakeToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoi7ZSE66Gg7Yq47KeRIiwidXNlcl9pZCI6IjAwMDAiLCJkZXBhcnRtZW50Ijoi7YWM7Iqk7Yq47ZWZ6rO8In0.signature";
+        onLoginSuccess(fakeToken); 
+        setIsLoading(false);
+      }, 1000); // 1초 로딩하는 척
+      return; // 아래 진짜 통신 코드는 실행 안 함
+    }
+    // 여기까지 ===========================================
 
     try {
       if (isLoginMode) {

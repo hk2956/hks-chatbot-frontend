@@ -10,12 +10,18 @@
 		"DisplayInfo": "Bear Commander Belongs_to_DG_STUDIO.cdi3.json",
 
 		"Expressions": [
-			{ "Name": "기본", "File": "exp/1.exp3.json" },
-            { "Name": "화난", "File": "exp/3.exp3.json" },
-            { "Name": "슬픈", "File": "exp/4.exp3.json" },
-            { "Name": "사랑", "File": "exp/5.exp3.json" },
-			{ "Name": "반짝", "File": "exp/6.exp3.json" },
-			{ "Name": "경멸", "File": "exp/7.exp3.json" }
+			{ "Name": "기본", "File": "exp/normal.exp3.json" },
+            { "Name": "화난", "File": "exp/angry.exp3.json" },
+            { "Name": "슬픈", "File": "exp/sad.exp3.json" },
+            { "Name": "사랑", "File": "exp/love.exp3.json" },
+			{ "Name": "반짝", "File": "exp/sparkle.exp3.json" },
+			{ "Name": "경멸", "File": "exp/contempt.exp3.json" },
+			{ "Name": "팔짱", "File": "exp/normalX.exp3.json" },
+			{ "Name": "화난 팔짱", "File": "exp/angryX.exp3.json" },
+			{ "Name": "슬픈 팔짱", "File": "exp/sadX.exp3.json" },
+			{ "Name": "사랑 팔짱", "File": "exp/loveX.exp3.json" },
+			{ "Name": "반짝 팔짱", "File": "exp/sparkleX.exp3.json" },
+			{ "Name": "경멸 팔짱", "File": "exp/contemptX.exp3.json" }
         ],
 
 		"Motions": {

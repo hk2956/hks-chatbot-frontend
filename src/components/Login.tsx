@@ -5,7 +5,7 @@ interface LoginProps {
 }
 
 export default function Login({ onLoginSuccess }: LoginProps) {
-  const IS_MOCK_MODE = true;
+  const IS_MOCK_MODE = false;
   // ⭐️ 탭 전환을 위한 상태 (true: 로그인 화면, false: 회원가입 화면)
   const [isLoginMode, setIsLoginMode] = useState(true);
 

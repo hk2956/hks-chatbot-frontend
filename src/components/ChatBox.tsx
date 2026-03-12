@@ -9,7 +9,7 @@ interface Message {
 }
 
 export default function ChatBox() {
-  const IS_MOCK_MODE = true;
+  const IS_MOCK_MODE = false;
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
